@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Chúc em Trung Thu vui vẻ — póe</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<style>
+  :root{
+    --bg1:#ff416c;
+    --bg2:#ff6bcb;
+    --text:#fff;
+  }
+  html,body{height:100%;margin:0;font-family: "Helvetica Neue",Arial, sans-serif;}
+  body{
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text);
+  }
+
+  .wrap{
+    width:100%;
+    max-width:720px;
+    padding:24px;
+    box-sizing:border-box;
+    text-align:center;
+    position:relative;
+  }
+
+  h1{
+    font-size:clamp(28px,8vw,56px);
+    margin:0 0 6px 0;
+    letter-spacing:1px;
+    text-shadow: 0 6px 28px rgba(255,20,80,0.25);
+    font-weight:800;
+  }
+  .name{
+    font-size:clamp(18px,4vw,28px);
+    margin-bottom:12px;
+    opacity:0.95;
+    font-weight:700;
+  }
+  .subtitle{
+    font-size:clamp(14px,3vw,18px);
+    margin-bottom:18px;
+    opacity:0.95;
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border-radius:18px;
+    padding:18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    backdrop-filter: blur(6px);
+  }
+
+  .controls{margin-top:12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;}
+  .btn{
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--text);
+    padding:10px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+    user-select:none;
+  }
+  .btn:active{transform:translateY(1px);}
+
+  /* QR area */
+  #qrcodeWrap{margin-top:12px; display:flex; justify-content:center;}
+
+  /* hearts */
+  .heart{
+    position:fixed;
+    width:30px;
+    height:30px;
+    transform:translate(-50%,-50%) rotate(45deg);
+    left:50%;
+    bottom:0;
+    pointer-events:none;
+    z-index:10;
+    opacity:0.95;
+  }
+  .heart:before,
+  .heart:after{
+    content:"";
+    position:absolute;
+    width:30px;
+    height:30px;
+    background:linear-gradient(45deg,#fff, rgba(255,255,255,0.2));
+    border-radius:50%;
+    top:-15px;
+    left:0;
+  }
+  .heart:after{left:15px;top:0;}
+  @keyframes floatUp{
+    0%{transform:translateY(0) rotate(45deg) scale(1); opacity:0.95;}
+    100%{transform:translateY(-110vh) rotate(25deg) scale(0.7); opacity:0;}
+  }
+
+  /* small note */
+  .note{font-size:12px;opacity:0.9;margin-top:8px}
+  footer{position:fixed;left:14px;bottom:10px;color:rgba(255,255,255,0.7);font-size:12px}
+</style>
+</head>
+<body>
+  <div class="wrap card">
+    <h1>Chúc em Trung Thu vui vẻ</h1>
+    <div class="name">— póe —</div>
+    <div class="subtitle">Một chút ngọt ngào, một chút nồng ấm. ❤</div>
+
+    <div class="controls">
+      <button class="btn" id="toggleMusic">Bật / Tắt nhạc</button>
+      <button class="btn" id="showQr">Show QR</button>
+      <button class="btn" id="downloadHtml">Tải file HTML</button>
+    </div>
+
+    <div id="qrcodeWrap" style="display:none;">
+      <div id="qrcode"></div>
+      <div style="margin-left:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+        <a id="qrDownload" class="btn" href="#" download="qr.png">Tải QR (giữ vài giây)</a>
+        <div class="note">QR sẽ trỏ đến URL hiện tại (host file lên để QR hoạt động khi gửi).</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Chúc bạn có một Trung Thu ấm áp ✨</footer>
+
+  <!-- audio (bật/tắt bằng nút). Thay src bằng link nhạc muốn dùng (mp3). -->
+  <audio id="bgMusic" loop preload="none">
+    <!-- Example: <source src="https://example.com/your-music.mp3" type="audio/mpeg"> -->
+  </audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  // tạo trái tim ngẫu nhiên
+  function spawnHeart(){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    const size = 20 + Math.random()*40;
+    h.style.width = h.style.height = size + 'px';
+    h.style.left = (10 + Math.random()*80) + '%';
+    h.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05))';
+    // color overlay
+    h.style.setProperty('filter', 'hue-rotate(' + (Math.random()*40 - 10) + 'deg)');
+    document.body.appendChild(h);
+    const dur = 3500 + Math.random()*2200;
+    h.style.animation = 'floatUp ' + dur + 'ms linear forwards';
+    // random delay for opacity start
+    setTimeout(()=>{ h.style.opacity = 1; }, 50);
+    setTimeout(()=> h.remove(), dur + 100);
+  }
+
+  // spawn many hearts periodically
+  let heartInterval = setInterval(spawnHeart, 500);
+  // initial burst
+  for(let i=0;i<6;i++) setTimeout(spawnHeart, i*120);
+
+  // Music toggle
+  const bg = document.getElementById('bgMusic');
+  const btn = document.getElementById('toggleMusic');
+  btn.addEventListener('click', ()=>{
+    if(bg.paused){
+      // if no source -> browser may block autoplay; user clicked so try to play
+      bg.play().catch(()=>{ alert('Trình duyệt chặn tự động phát; hãy thêm source MP3 trong file HTML hoặc chạm vào trang rồi bấm lại.'); });
+      btn.textContent = 'Tắt nhạc';
+    } else {
+      bg.pause();
+      btn.textContent = 'Bật / Tắt nhạc';
+    }
+  });
+
+  // QR code
+  const qWrap = document.getElementById('qrcodeWrap');
+  const qBtn = document.getElementById('showQr');
+  let qrcode;
+  qBtn.addEventListener('click', ()=>{
+    if(qWrap.style.display === 'none'){
+      qWrap.style.display = 'flex';
+      if(!qrcode){
+        // địa chỉ sẽ là current location; nếu file đang chạy local, QR sẽ trỏ đến file://... (không dùng từ xa).
+        const url = location.href;
+        qrcode = new QRCode(document.getElementById("qrcode"), {
+          text: url,
+          width: 160,
+          height: 160,
+          correctLevel : QRCode.CorrectLevel.H
+        });
+        // tạo ảnh download từ canvas/svg
+        setTimeout(()=> {
+          // canvas fallback (qrcodejs uses table/img) - convert to canvas via drawing
+          const qrImg = document.querySelector('#qrcode img') || document.querySelector('#qrcode canvas');
+          if(qrImg){
+            // set qrDownload href
+            try {
+              if(qrImg.tagName === 'IMG'){
+                document.getElementById('qrDownload').href = qrImg.src;
+              } else {
+                document.getElementById('qrDownload').href = qrImg.toDataURL('image/png');
+              }
+            } catch(e){}
+          }
+        }, 300);
+      }
+      qBtn.textContent = 'Hide QR';
+    } else {
+      qWrap.style.display = 'none';
+      qBtn.textContent = 'Show QR';
+    }
+  });
+
+  // Download HTML button: create blob and download
+  document.getElementById('downloadHtml').addEventListener('click', ()=>{
+    const html = `<!doctype html>\n` + document.documentElement.outerHTML;
+    const blob = new Blob([html], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'trungthu.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // Helpful tip: if user wants specific song, set bg.src = 'https://.../song.mp3' in the HTML.
+</script>
+</body>
+</html>
